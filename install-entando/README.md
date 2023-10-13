@@ -1,11 +1,11 @@
 
-# Entando CLI
+# Install Entando CLI v1.0.0
 
-The Entando CLI is a command-line tool for simplifying the installation of Entando. This tool streamlines the installation process and provides a guided experience to set up Entando in your Kubernetes cluster.
+The Install Entando CLI is a command-line tool for simplifying the installation of Entando. This tool streamlines the installation process and provides a guided experience to set up Entando in your Kubernetes cluster.
 
 ## Installation
 
-The Entando CLI is not available on npm. Instead, you can download the binary distribution for your OS and architecture from the [releases](https://github.com/entando/catalyst-infra-tools/releases?q=install-entando&expanded=true) page. The binary files are named in the following format:
+The Install Entando CLI is not available on npm. Instead, you can download the binary distribution for your OS and architecture from the [releases](https://github.com/entando/catalyst-infra-tools/releases?q=install-entando&expanded=true) page. The binary files are named in the following format:
 
 - Linux: `install-entando-v1.0.0-linux-arm64` | `install-entando-v1.0.0-linux-x64`
 
@@ -17,7 +17,7 @@ Once you've downloaded the appropriate binary for your system, you can run it fr
 
 ## Usage
 
-To use the Entando CLI, follow these steps:
+To use the Install Entando CLI, follow these steps:
 
 1. Download the binary for your OS and architecture as mentioned in the installation section.
 
