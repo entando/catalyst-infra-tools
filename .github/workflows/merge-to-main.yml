@@ -1,0 +1,28 @@
+name: Merge any project's release branch to develop
+run-name: A PR has been merged in ${{ github.base_ref }}
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - '*/*.*.*'
+
+jobs:
+  if_merged:
+    name: Merge to main
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Merge ${{ github.base_ref }} -> main
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          target_branch: main
+          message: Merge ${{ github.base_ref }} branch into main
+          github_token: ${{ secrets.GITHUB_TOKEN }}
