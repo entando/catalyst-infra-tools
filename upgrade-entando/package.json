@@ -1,0 +1,75 @@
+{
+  "name": "upgrade-entando",
+  "version": "1.0.0",
+  "description": "Upgrade Entando CLI",
+  "author": "Entando @entando",
+  "bin": {
+    "upgrade-entando": "bin/run"
+  },
+  "homepage": "https://github.com/entando/catalyst-infra-tools/tree/main/upgrade-entando",
+  "license": "LGPL-3.0-only",
+  "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/entando/catalyst-infra-tools.git"
+  },
+  "files": [
+    "/bin",
+    "/dist",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json"
+  ],
+  "dependencies": {
+    "@inquirer/prompts": "^3.2.0",
+    "@kubernetes/client-node": "^0.19.0",
+    "@oclif/core": "^2",
+    "@oclif/plugin-help": "^5",
+    "@oclif/plugin-plugins": "^3.8.3",
+    "@types/listr": "^0.14.5",
+    "axios": "^0.27.2",
+    "listr": "^0.14.3"
+  },
+  "devDependencies": {
+    "@oclif/test": "^2.5.6",
+    "@types/chai": "^4",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^16.18.55",
+    "chai": "^4",
+    "eslint": "^7.32.0",
+    "eslint-config-oclif": "^4",
+    "eslint-config-oclif-typescript": "^1.0.3",
+    "mocha": "^9",
+    "oclif": "^3.17.1",
+    "shx": "^0.3.3",
+    "ts-node": "^10.9.1",
+    "tslib": "^2.6.2",
+    "typescript": "^4.9.5"
+  },
+  "oclif": {
+    "bin": "upgrade-entando",
+    "default": ".",
+    "dirname": "upgrade-entando",
+    "commands": "./dist",
+    "plugins": [
+      "@oclif/plugin-help",
+      "@oclif/plugin-plugins"
+    ]
+  },
+  "scripts": {
+    "build": "shx rm -rf dist && tsc -b",
+    "lint": "eslint . --ext .ts --config .eslintrc",
+    "postpack": "shx rm -f oclif.manifest.json",
+    "posttest": "npm run lint",
+    "prepack": "npm run build && oclif manifest && oclif readme",
+    "test": "mocha --forbid-only \"test/**/*.test.ts\"",
+    "version": "oclif readme && git add README.md"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "bugs": "https://github.com/entando/catalyst-infra-tools/issues",
+  "keywords": [
+    "oclif"
+  ],
+  "types": "dist/index.d.ts"
+}
