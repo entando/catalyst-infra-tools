@@ -1,0 +1,157 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: '1'
+  creationTimestamp: 2023-11-06T16:40:25.000Z
+  generation: 2
+  labels:
+    EntandoDatabaseService: default-postgresql-dbms-in-namespace
+    entando.org/capability: Dbms
+    entando.org/capability-implementation: Postgresql
+    entando.org/capability-provision-scope: Namespace
+    entando.org/deployment: default-postgresql-dbms-in-namespace
+    entando.org/entando-resource-kind: EntandoDatabaseService
+    entando.org/entando-resource-namespace: test-rfadda
+  name: default-postgresql-dbms-in-namespace-deployment
+  namespace: test-rfadda
+  ownerReferences:
+    - apiVersion: entando.org/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: EntandoDatabaseService
+      name: default-postgresql-dbms-in-namespace
+      uid: d09efad9-4a9a-45ed-928e-cd7b2ce4a923
+  uid: d461e4d6-42c1-4da8-9eec-c761a63d39ac
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 0
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      EntandoDatabaseService: default-postgresql-dbms-in-namespace
+      entando.org/capability: Dbms
+      entando.org/capability-implementation: Postgresql
+      entando.org/capability-provision-scope: Namespace
+      entando.org/deployment: default-postgresql-dbms-in-namespace
+      entando.org/entando-resource-kind: EntandoDatabaseService
+      entando.org/entando-resource-namespace: test-rfadda
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        EntandoDatabaseService: default-postgresql-dbms-in-namespace
+        entando.org/capability: Dbms
+        entando.org/capability-implementation: Postgresql
+        entando.org/capability-provision-scope: Namespace
+        entando.org/deployment: default-postgresql-dbms-in-namespace
+        entando.org/entando-resource-kind: EntandoDatabaseService
+        entando.org/entando-resource-namespace: test-rfadda
+      name: default-postgresql-dbms-in-namespace-pod
+    spec:
+      containers:
+        - env:
+            - name: CONNECTION_CONFIG_ROOT
+              value: /etc/entando/secrets
+            - name: POSTGRESQL_DATABASE
+              value: default_postgresql_dbms_in_namespace_db
+            - name: POSTGRESQL_USER
+              value: default_postgresql_dbms_in_namespace_db_user
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: default-postgresql-dbms-in-namespace-admin-secret
+                  optional: false
+            - name: POSTGRESQL_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: default-postgresql-dbms-in-namespace-admin-secret
+                  optional: false
+          image: registry.hub.docker.com/entando/entando-postgres-rocky:14.1.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - '-i'
+                - '-c'
+                - /usr/libexec/check-container
+            failureThreshold: 1
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 3
+          name: db-container
+          ports:
+            - containerPort: 5432
+              name: db-port
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - '-i'
+                - '-c'
+                - /usr/libexec/check-container
+            failureThreshold: 1
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 125m
+              memory: 64Mi
+          startupProbe:
+            exec:
+              command:
+                - /bin/sh
+                - '-i'
+                - '-c'
+                - /usr/libexec/check-container
+            failureThreshold: 11
+            periodSeconds: 18
+            successThreshold: 1
+            timeoutSeconds: 5
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /var/lib/pgsql/data
+              name: default-postgresql-dbms-in-namespace-db-volume
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 26
+      serviceAccount: default
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: default-postgresql-dbms-in-namespace-db-volume
+          persistentVolumeClaim:
+            claimName: default-postgresql-dbms-in-namespace-db-pvc
+status:
+  conditions:
+    - lastTransitionTime: 2023-11-06T16:40:59.000Z
+      lastUpdateTime: 2023-11-06T16:40:59.000Z
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: 'True'
+      type: Available
+    - lastTransitionTime: 2023-11-06T16:40:25.000Z
+      lastUpdateTime: 2023-11-06T16:40:59.000Z
+      message: >-
+        ReplicaSet "default-postgresql-dbms-in-namespace-deployment-6d9cf54fcf"
+        has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: 'True'
+      type: Progressing
+  observedGeneration: 2

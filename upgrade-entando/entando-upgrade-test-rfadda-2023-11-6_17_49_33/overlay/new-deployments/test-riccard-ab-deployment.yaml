@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: '2'
+  creationTimestamp: 2023-11-06T16:43:43.000Z
+  generation: 4
+  labels:
+    EntandoApp: test-riccard
+    entando.org/deployment: test-riccard-ab
+    entando.org/entando-resource-kind: EntandoApp
+    entando.org/entando-resource-namespace: test-rfadda
+  name: test-riccard-ab-deployment
+  namespace: test-rfadda
+  ownerReferences:
+    - apiVersion: entando.org/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: EntandoApp
+      name: test-riccard
+      uid: 298aedc4-0a67-4b06-b1f2-a60cfb463b7b
+  uid: f636a6dd-09a5-432c-a32f-d2dce9bded57
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      EntandoApp: test-riccard
+      entando.org/deployment: test-riccard-ab
+      entando.org/entando-resource-kind: EntandoApp
+      entando.org/entando-resource-namespace: test-rfadda
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        EntandoApp: test-riccard
+        entando.org/deployment: test-riccard-ab
+        entando.org/entando-resource-kind: EntandoApp
+        entando.org/entando-resource-namespace: test-rfadda
+      name: test-riccard-ab-pod
+    spec:
+      containers:
+        - env:
+            - name: SERVER_SERVLET_CONTEXT_PATH
+              value: /app-builder/
+            - name: CONNECTION_CONFIG_ROOT
+              value: /etc/entando/secrets
+            - name: DOMAIN
+              value: /entando-de-app
+            - name: MAX_RAM_PERCENTAGE
+              value: '75'
+          image: registry.hub.docker.com/entando/app-builder:7.3.0-rc1
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 1
+            httpGet:
+              path: /app-builder/favicon-entando.png
+              port: 8081
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 3
+          name: appbuilder-container
+          ports:
+            - containerPort: 8081
+              name: appbuilder-port
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 1
+            httpGet:
+              path: /app-builder/favicon-entando.png
+              port: 8081
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 125m
+              memory: 128Mi
+          startupProbe:
+            failureThreshold: 11
+            httpGet:
+              path: /app-builder/favicon-entando.png
+              port: 8081
+              scheme: HTTP
+            periodSeconds: 24
+            successThreshold: 1
+            timeoutSeconds: 5
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 185
+      serviceAccount: default
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+    - lastTransitionTime: 2023-11-06T16:43:43.000Z
+      lastUpdateTime: 2023-11-06T16:50:00.000Z
+      message: >-
+        ReplicaSet "test-riccard-ab-deployment-54dfdd87f9" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: 'True'
+      type: Progressing
+    - lastTransitionTime: 2023-11-06T16:50:27.000Z
+      lastUpdateTime: 2023-11-06T16:50:27.000Z
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: 'True'
+      type: Available
+  observedGeneration: 4
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

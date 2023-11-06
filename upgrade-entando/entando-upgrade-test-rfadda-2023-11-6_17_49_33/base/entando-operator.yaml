@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: '1'
+  creationTimestamp: 2023-11-06T16:39:52.000Z
+  generation: 2
+  name: entando-operator
+  namespace: test-rfadda
+  uid: 14928cd7-d68e-4fa6-a613-6379e4802c2a
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 0
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      deployment: entando-operator
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        deployment: entando-operator
+    spec:
+      containers:
+        - env:
+            - name: ENTANDO_K8S_OPERATOR_DEPLOYMENT_TYPE
+              value: helm
+            - name: ENTANDO_NAMESPACES_TO_OBSERVE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: ENTANDO_K8S_OPERATOR_SERVICEACCOUNT
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.serviceAccountName
+            - name: ENTANDO_DISABLE_KEYCLOAK_SSL_REQUIREMENT
+              value: 'true'
+            - name: ENTANDO_K8S_OPERATOR_FORCE_DB_PASSWORD_RESET
+              value: 'true'
+            - name: ENTANDO_K8S_OPERATOR_GC_CONTROLLER_PODS
+              value: 'true'
+            - name: ENTANDO_K8S_OPERATOR_IMPOSE_LIMITS
+              value: 'false'
+            - name: ENTANDO_K8S_OPERATOR_SECURITY_MODE
+              value: strict
+            - name: ENTANDO_POD_COMPLETION_TIMEOUT_SECONDS
+              value: '2000'
+            - name: ENTANDO_POD_READINESS_TIMEOUT_SECONDS
+              value: '2000'
+            - name: ENTANDO_POD_SHUTDOWN_TIMEOUT_SECONDS
+              value: '2000'
+            - name: ENTANDO_TIMEOUT_ADJUSTMENT_RATIO
+              value: '2.0'
+          image: >-
+            registry.hub.docker.com/entando/entando-k8s-controller-coordinator:7.2.0
+          imagePullPolicy: Always
+          livenessProbe:
+            exec:
+              command:
+                - cat
+                - /tmp/EntandoControllerCoordinator.ready
+            failureThreshold: 1
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          name: operator
+          readinessProbe:
+            exec:
+              command:
+                - cat
+                - /tmp/EntandoControllerCoordinator.ready
+            failureThreshold: 1
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          resources: {}
+          startupProbe:
+            exec:
+              command:
+                - cat
+                - /tmp/EntandoControllerCoordinator.ready
+            failureThreshold: 20
+            periodSeconds: 3
+            successThreshold: 1
+            timeoutSeconds: 3
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: entando-operator
+      serviceAccountName: entando-operator
+      terminationGracePeriodSeconds: 30
+status:
+  conditions:
+    - lastTransitionTime: 2023-11-06T16:39:59.000Z
+      lastUpdateTime: 2023-11-06T16:39:59.000Z
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: 'True'
+      type: Available
+    - lastTransitionTime: 2023-11-06T16:39:53.000Z
+      lastUpdateTime: 2023-11-06T16:39:59.000Z
+      message: ReplicaSet "entando-operator-7cdd6bd674" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: 'True'
+      type: Progressing
+  observedGeneration: 2

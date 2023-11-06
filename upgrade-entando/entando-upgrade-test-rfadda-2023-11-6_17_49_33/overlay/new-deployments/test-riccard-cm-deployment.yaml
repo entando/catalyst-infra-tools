@@ -1,0 +1,179 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: '2'
+  creationTimestamp: 2023-11-06T16:44:02.000Z
+  generation: 4
+  labels:
+    EntandoApp: test-riccard
+    entando.org/deployment: test-riccard-cm
+    entando.org/entando-resource-kind: EntandoApp
+    entando.org/entando-resource-namespace: test-rfadda
+  name: test-riccard-cm-deployment
+  namespace: test-rfadda
+  ownerReferences:
+    - apiVersion: entando.org/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: EntandoApp
+      name: test-riccard
+      uid: 298aedc4-0a67-4b06-b1f2-a60cfb463b7b
+  uid: 82d60155-c9e0-40b8-bfe6-962f2d0d9b02
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      EntandoApp: test-riccard
+      entando.org/deployment: test-riccard-cm
+      entando.org/entando-resource-kind: EntandoApp
+      entando.org/entando-resource-namespace: test-rfadda
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        EntandoApp: test-riccard
+        entando.org/deployment: test-riccard-cm
+        entando.org/entando-resource-kind: EntandoApp
+        entando.org/entando-resource-namespace: test-rfadda
+      name: test-riccard-cm-pod
+    spec:
+      containers:
+        - env:
+            - name: SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI
+              value: http://test-riccardo.k8s-entando.org/auth/realms/entando
+            - name: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: clientSecret
+                  name: test-riccard-de-secret
+                  optional: false
+            - name: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  key: clientId
+                  name: test-riccard-de-secret
+                  optional: false
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: test-riccard-dedb-secret
+                  optional: false
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: test-riccard-dedb-secret
+                  optional: false
+            - name: SPRING_DATASOURCE_URL
+              value: >-
+                jdbc:postgresql://default-postgresql-dbms-in-namespace-service.test-rfadda.svc.cluster.local:5432/default_postgresql_dbms_in_namespace_db
+            - name: SPRING_JPA_DATABASE_PLATFORM
+              value: org.hibernate.dialect.PostgreSQLDialect
+            - name: SERVER_SERVLET_CONTEXT_PATH
+              value: /digital-exchange
+            - name: CONNECTION_CONFIG_ROOT
+              value: /etc/entando/secrets
+            - name: ENTANDO_APP_NAME
+              value: test-riccard
+            - name: ENTANDO_APP_HOST_NAME
+              value: test-riccardo.k8s-entando.org
+            - name: ENTANDO_APP_USE_TLS
+              value: 'false'
+            - name: ENTANDO_URL
+              value: >-
+                http://test-riccard-service.test-rfadda.svc.cluster.local:8080/entando-de-app
+            - name: SERVER_PORT
+              value: '8083'
+            - name: ENTANDO_K8S_SERVICE_URL
+              value: >-
+                http://entando-k8s-service.test-rfadda.svc.cluster.local:8084/k8s
+            - name: MAX_RAM_PERCENTAGE
+              value: '75'
+          image: registry.hub.docker.com/entando/entando-component-manager:7.3.0-rc1
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 1
+            httpGet:
+              path: /digital-exchange/actuator/health
+              port: 8083
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 3
+          name: de-container
+          ports:
+            - containerPort: 8083
+              name: de-port
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 1
+            httpGet:
+              path: /digital-exchange/actuator/health
+              port: 8083
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 750m
+              memory: 1500Mi
+            requests:
+              cpu: 188m
+              memory: 375Mi
+          startupProbe:
+            failureThreshold: 11
+            httpGet:
+              path: /digital-exchange/actuator/health
+              port: 8083
+              scheme: HTTP
+            periodSeconds: 24
+            successThreshold: 1
+            timeoutSeconds: 5
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /entando-data
+              name: test-riccard-de-volume
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 185
+      serviceAccount: default
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: test-riccard-de-volume
+          persistentVolumeClaim:
+            claimName: test-riccard-de-pvc
+status:
+  availableReplicas: 1
+  conditions:
+    - lastTransitionTime: 2023-11-06T16:44:02.000Z
+      lastUpdateTime: 2023-11-06T16:50:00.000Z
+      message: >-
+        ReplicaSet "test-riccard-cm-deployment-585449c74f" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: 'True'
+      type: Progressing
+    - lastTransitionTime: 2023-11-06T16:53:29.000Z
+      lastUpdateTime: 2023-11-06T16:53:29.000Z
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: 'True'
+      type: Available
+  observedGeneration: 4
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
